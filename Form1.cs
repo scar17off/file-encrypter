@@ -149,17 +149,26 @@ namespace FileEncrypter
                     foreach (var file in files)
                     {
                         string fileName = Path.GetFileName(file);
-                        string fileContent = File.ReadAllText(file);
+                        string fileExtension = Path.GetExtension(file).ToLower();
 
-                        string encryptedContent = Encrypt(fileContent, keyInput.Text);
+                        if (!IsImageFileExtension(fileExtension))
+                        {
+                            // Process text files
+                            string fileContent = File.ReadAllText(file);
+                            string encryptedContent = Encrypt(fileContent, keyInput.Text);
 
-                        Image image = ConvertToImage(fileContent);
-                        pictureBox1.Image = image;
+                            Image image = ConvertToImage(fileContent);
+                            pictureBox1.Image = image;
 
-                        Image encryptedImage = ConvertToImage(encryptedContent);
+                            Image encryptedImage = ConvertToImage(encryptedContent);
 
-                        string imagePath = Path.Combine(encryptedSubdirectory, fileName + ".png");
-                        encryptedImage.Save(imagePath, System.Drawing.Imaging.ImageFormat.Png);
+                            string imagePath = Path.Combine(encryptedSubdirectory, fileName + ".png");
+                            encryptedImage.Save(imagePath, System.Drawing.Imaging.ImageFormat.Png);
+                        }
+                        else
+                        {
+                            // TODO: Process image files
+                        }
 
                         encryptingProgressBar.Value++;
                         Application.DoEvents();
@@ -176,6 +185,11 @@ namespace FileEncrypter
             {
                 Console.WriteLine($"Error: {ex.Message}");
             }
+        }
+
+        private bool IsImageFileExtension(string extension)
+        {
+            return extension == ".png" || extension == ".jpg" || extension == ".jpeg";
         }
 
         private int CountFiles(string folderPath)
